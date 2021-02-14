@@ -10,6 +10,10 @@ using MongoDB.Driver;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Bson;
+using Microsoft.EntityFrameworkCore;
+using dotnet5todoapp.Database;
+using Npgsql;
+
 namespace dotnet5todoapp
 {
     public class Startup
@@ -25,16 +29,24 @@ namespace dotnet5todoapp
         public void ConfigureServices(IServiceCollection services)
         {
 
-            BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
-            BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(BsonType.String));
+            // Mongodb DI
+            // BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
+            // BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(BsonType.String));
 
-            services.AddSingleton<IMongoClient>(serviceProvider =>
-            {
-                var settings = Configuration.GetSection(nameof(MongoDBSettings)).Get<MongoDBSettings>();
-                return new MongoClient(settings.ConnectionString);
-            });
+            // services.AddSingleton<IMongoClient>(serviceProvider =>
+            // {
+            //     var settings = Configuration.GetSection(nameof(MongoDBSettings)).Get<MongoDBSettings>();
+            //     return new MongoClient(settings.ConnectionString);
+            // });
 
-            services.AddSingleton<ITodosRepository, MongoDBTodoRepository>();
+            // services.AddSingleton<ITodosRepository, MongoDBTodoRepository>();
+
+            // Postgres DI
+            var settings = Configuration.GetSection(nameof(PostgresDBSettings)).Get<PostgresDBSettings>();
+            services.AddDbContext<PostgesContext>(options => options.UseNpgsql(settings.ConnectionString));
+
+            services.AddScoped<ITodosRepository, PostgresDBTodoRepository>();
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
