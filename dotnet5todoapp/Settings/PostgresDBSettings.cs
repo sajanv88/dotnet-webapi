@@ -19,5 +19,3 @@ namespace dotnet5todoapp
         }
     }
 }
-// protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-//     => optionsBuilder.UseNpgsql("Host=localhost;Database=todos;Username=postgres;Password=password");

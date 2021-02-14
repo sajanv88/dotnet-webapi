@@ -15,12 +15,11 @@ namespace dotnet5todoapp.Database
         {
             base.OnModelCreating(builder);
         }
-
-        // public override int SaveChanges()
-        // {
-        //     ChangeTracker.DetectChanges();
-        //     return base.SaveChanges();
-        // }
+        public override int SaveChanges()
+        {
+            ChangeTracker.DetectChanges();
+            return base.SaveChanges();
+        }
 
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using dotnet5todoapp.Models;
 using dotnet5todoapp.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace dotnet5todoapp.Controllers
 {
@@ -18,17 +19,17 @@ namespace dotnet5todoapp.Controllers
 
         // Get /todos
         [HttpGet]
-        public ActionResult<IEnumerable<TodoDto>> GetTodoItems()
+        public async Task<ActionResult<IEnumerable<TodoDto>>> GetTodoItemsAsync()
         {
-            var todoItems = this.repository.GetTodos();
+            var todoItems = await this.repository.GetTodosAsync();
             return Ok(todoItems);
         }
 
         // Get /todos/{id}
         [HttpGet("{id}")]
-        public ActionResult<TodoDto> GetTodoItem(Guid id)
+        public async Task<ActionResult<TodoDto>> GetTodoItemAsync(Guid id)
         {
-            var todoItem = this.repository.GetTodo(id);
+            var todoItem = await this.repository.GetTodoAsync(id);
             if (todoItem == null)
             {
                 return NotFound();
@@ -39,7 +40,7 @@ namespace dotnet5todoapp.Controllers
 
         // Post /todos
         [HttpPost]
-        public ActionResult<TodoDto> CreateTodoItem(CreateTodoDto todoDto)
+        public async Task<ActionResult<TodoDto>> CreateTodoItemAsync(CreateTodoDto todoDto)
         {
             TodoItem todoItem = new()
             {
@@ -49,16 +50,15 @@ namespace dotnet5todoapp.Controllers
                 Status = false
             };
 
-            this.repository.CreateTodo(todoItem);
-
-            return CreatedAtAction(nameof(GetTodoItem), new { Id = todoItem.Id }, todoItem.AsDto());
+            await this.repository.CreateTodoAsync(todoItem);
+            return CreatedAtAction(nameof(GetTodoItemAsync), new { Id = todoItem.Id }, todoItem.AsDto());
         }
 
         // Put todos/{id}
         [HttpPut("{id}")]
-        public ActionResult<TodoDto> UpdateTodoItem(Guid id, UpdateTodoDto todoDto)
+        public async Task<ActionResult<TodoDto>> UpdateTodoItemAsync(Guid id, UpdateTodoDto todoDto)
         {
-            var exitingTodoItem = this.repository.GetTodo(id);
+            var exitingTodoItem = await this.repository.GetTodoAsync(id);
             if (exitingTodoItem == null)
             {
                 return NotFound();
@@ -70,21 +70,21 @@ namespace dotnet5todoapp.Controllers
                 Status = todoDto.Status
             };
 
-            this.repository.UpdateTodo(todoItem);
+            await this.repository.UpdateTodoAsync(todoItem);
             return NoContent();
         }
 
         // Delete todos/{id}
         [HttpDelete("{id}")]
-        public ActionResult DeleteTodoItem(Guid id)
+        public async Task<ActionResult> DeleteTodoItemAsync(Guid id)
         {
-            var exitingTodoItem = this.repository.GetTodo(id);
+            var exitingTodoItem = await this.repository.GetTodoAsync(id);
             if (exitingTodoItem == null)
             {
                 return NotFound();
             }
 
-            this.repository.DeleteTodo(id);
+            await this.repository.DeleteTodoAsync(id);
             return NoContent();
         }
     }

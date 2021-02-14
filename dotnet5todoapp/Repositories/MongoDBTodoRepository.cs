@@ -4,6 +4,7 @@ using dotnet5todoapp.Models;
 using dotnet5todoapp.Repositories;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using System.Threading.Tasks;
 namespace dotnet5todoapp
 {
     public class MongoDBTodoRepository : ITodosRepository
@@ -21,32 +22,32 @@ namespace dotnet5todoapp
             todosCollection = database.GetCollection<TodoItem>(CollectionName);
         }
 
-        public void CreateTodo(TodoItem todoItem)
+        public async Task CreateTodoAsync(TodoItem todoItem)
         {
-            todosCollection.InsertOne(todoItem);
+            await todosCollection.InsertOneAsync(todoItem);
         }
 
-        public void DeleteTodo(Guid id)
-        {
-            var filter = filterBuilder.Eq(todoItem => todoItem.Id, id);
-            todosCollection.DeleteOne(filter);
-        }
-
-        public TodoItem GetTodo(Guid id)
+        public async Task DeleteTodoAsync(Guid id)
         {
             var filter = filterBuilder.Eq(todoItem => todoItem.Id, id);
-            return todosCollection.Find(filter).SingleOrDefault();
+            await todosCollection.DeleteOneAsync(filter);
         }
 
-        public IEnumerable<TodoItem> GetTodos()
+        public async Task<TodoItem> GetTodoAsync(Guid id)
         {
-            return todosCollection.Find(new BsonDocument()).ToList();
+            var filter = filterBuilder.Eq(todoItem => todoItem.Id, id);
+            return await todosCollection.Find(filter).SingleOrDefaultAsync();
         }
 
-        public void UpdateTodo(TodoItem todoItem)
+        public async Task<IEnumerable<TodoItem>> GetTodosAsync()
+        {
+            return await todosCollection.Find(new BsonDocument()).ToListAsync();
+        }
+
+        public async Task UpdateTodoAsync(TodoItem todoItem)
         {
             var filter = filterBuilder.Eq(existingTodoItem => existingTodoItem.Id, todoItem.Id);
-            todosCollection.ReplaceOne(filter, todoItem);
+            await todosCollection.ReplaceOneAsync(filter, todoItem);
         }
     }
 }

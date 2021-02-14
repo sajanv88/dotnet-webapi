@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace dotnet5todoapp
 {
@@ -17,33 +18,33 @@ namespace dotnet5todoapp
             _context = context;
         }
 
-        public void CreateTodo(TodoItem todoItem)
+        public async Task CreateTodoAsync(TodoItem todoItem)
         {
-            _context.todoItems.Add(todoItem);
-            _context.SaveChanges();
+            await _context.todoItems.AddAsync(todoItem);
+            await _context.SaveChangesAsync();
         }
 
-        public void DeleteTodo(Guid id)
+        public async Task DeleteTodoAsync(Guid id)
         {
-            var entity = _context.todoItems.FirstOrDefault(todoItem => todoItem.Id == id);
+            var entity = await _context.todoItems.FirstOrDefaultAsync(todoItem => todoItem.Id == id);
             _context.todoItems.Remove(entity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public TodoItem GetTodo(Guid id)
+        public async Task<TodoItem> GetTodoAsync(Guid id)
         {
-            return _context.todoItems.AsNoTracking().FirstOrDefault(todoItem => todoItem.Id == id);
+            return await _context.todoItems.AsNoTracking().FirstOrDefaultAsync(todoItem => todoItem.Id == id);
         }
 
-        public IEnumerable<TodoItem> GetTodos()
+        public async Task<IEnumerable<TodoItem>> GetTodosAsync()
         {
-            return _context.todoItems.ToList();
+            return await _context.todoItems.ToListAsync();
         }
 
-        public void UpdateTodo(TodoItem todoItem)
+        public async Task UpdateTodoAsync(TodoItem todoItem)
         {
             _context.todoItems.Update(todoItem);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

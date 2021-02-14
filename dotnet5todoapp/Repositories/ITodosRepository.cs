@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using dotnet5todoapp.Models;
+using System.Threading.Tasks;
 
 namespace dotnet5todoapp.Repositories
 {
     public interface ITodosRepository
     {
-        IEnumerable<TodoItem> GetTodos();
-        TodoItem GetTodo(Guid id);
+        Task<IEnumerable<TodoItem>> GetTodosAsync();
+        Task<TodoItem> GetTodoAsync(Guid id);
 
-        void CreateTodo(TodoItem todoItem);
-        void UpdateTodo(TodoItem todoItem);
+        Task CreateTodoAsync(TodoItem todoItem);
+        Task UpdateTodoAsync(TodoItem todoItem);
 
-        void DeleteTodo(Guid id);
+        Task DeleteTodoAsync(Guid id);
     }
 }
