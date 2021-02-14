@@ -47,7 +47,10 @@ namespace dotnet5todoapp
 
             services.AddScoped<ITodosRepository, PostgresDBTodoRepository>();
 
-            services.AddControllers();
+            services.AddControllers(options =>
+            {
+                options.SuppressAsyncSuffixInActionNames = false;
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "dotnet5todoapp", Version = "v1" });
@@ -64,7 +67,7 @@ namespace dotnet5todoapp
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "dotnet5todoapp v1"));
             }
 
-            if(env.IsDevelopment())
+            if (env.IsDevelopment())
             {
                 app.UseHttpsRedirection();
             }
