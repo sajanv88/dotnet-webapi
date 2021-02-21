@@ -1,17 +1,18 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using dotnet5todoapp.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using MongoDB.Driver;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Bson;
+using Microsoft.EntityFrameworkCore;
+using dotnet5todoapp.Database;
+using Npgsql;
 
 namespace dotnet5todoapp
 {
@@ -28,8 +29,28 @@ namespace dotnet5todoapp
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddSingleton<ITodosRepository, InMemoryRepository>();
-            services.AddControllers();
+            // Mongodb DI
+            // BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
+            // BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(BsonType.String));
+
+            // services.AddSingleton<IMongoClient>(serviceProvider =>
+            // {
+            //     var settings = Configuration.GetSection(nameof(MongoDBSettings)).Get<MongoDBSettings>();
+            //     return new MongoClient(settings.ConnectionString);
+            // });
+
+            // services.AddSingleton<ITodosRepository, MongoDBTodoRepository>();
+
+            // Postgres DI
+            var settings = Configuration.GetSection(nameof(PostgresDBSettings)).Get<PostgresDBSettings>();
+            services.AddDbContext<PostgesContext>(options => options.UseNpgsql(settings.ConnectionString));
+
+            services.AddScoped<ITodosRepository, PostgresDBTodoRepository>();
+
+            services.AddControllers(options =>
+            {
+                options.SuppressAsyncSuffixInActionNames = false;
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "dotnet5todoapp", Version = "v1" });
@@ -46,7 +67,10 @@ namespace dotnet5todoapp
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "dotnet5todoapp v1"));
             }
 
-            app.UseHttpsRedirection();
+            if (env.IsDevelopment())
+            {
+                app.UseHttpsRedirection();
+            }
 
             app.UseRouting();
 

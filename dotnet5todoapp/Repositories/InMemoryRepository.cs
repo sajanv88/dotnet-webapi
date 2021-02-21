@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using dotnet5todoapp.Models;
+using System.Threading.Tasks;
 
 namespace dotnet5todoapp.Repositories
 {
@@ -12,31 +13,35 @@ namespace dotnet5todoapp.Repositories
             new TodoItem { Id = Guid.NewGuid(), Description = "Build first todo app", Status = false, CreatedAt = DateTimeOffset.UtcNow }
         };
 
-        public IEnumerable<TodoItem> GetTodos()
+        public async Task<IEnumerable<TodoItem>> GetTodosAsync()
         {
-            return todos;
+            return await Task.FromResult(todos);
         }
 
-        public TodoItem GetTodo(Guid id)
+        public async Task<TodoItem> GetTodoAsync(Guid id)
         {
-            return todos.Find(todo => todo.Id == id);
+            return await Task.FromResult(todos.Find(todo => todo.Id == id));
         }
 
-        public void CreateTodo(TodoItem todoItem)
+        public async Task CreateTodoAsync(TodoItem todoItem)
         {
             todos.Add(todoItem);
+            await Task.CompletedTask;
         }
 
-        public void UpdateTodo(TodoItem todoItem)
+        public async Task UpdateTodoAsync(TodoItem todoItem)
         {
             var index = todos.FindIndex(todo => todo.Id == todoItem.Id);
             todos[index] = todoItem;
+            await Task.CompletedTask;
+
         }
 
-        public void DeleteTodo(Guid id)
+        public async Task DeleteTodoAsync(Guid id)
         {
             var index = todos.FindIndex(todo => todo.Id == id);
             todos.RemoveAt(index);
+            await Task.CompletedTask;
         }
     }
 }
